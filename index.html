@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="charset" content="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <style>
+            *
+            {
+                box-sizing: border-box;
+            }
+
+            checkbook
+            {
+                display: block;
+                overflow-x: auto;
+            }
+
+            table, th, td
+            {
+                text-align: left;
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
+        </style>
+        <script src="./checkbook.js"></script>
+    </head>
+    <body>
+        <script>
+            let request = window.indexedDB.open("checkbook-register", 1);
+            request.addEventListener
+            (
+                "success",
+                (event) =>
+                {
+                    window.checkbook = new Checkbook(event.target.result);
+                    window.checkbook.update();
+                    document.body.appendChild(window.checkbook.element);
+                }
+            );
+            request.addEventListener
+            (
+                "upgradeneeded",
+                (event) =>
+                {
+                    let database = event.target.result;
+                    let entryStore = database.createObjectStore("entry", {autoIncrement: true});
+                    entryStore.createIndex("date", "date", {unique:false});
+                    entryStore.createIndex("reconcile", "reconcile", {unique:false});
+                    entryStore.createIndex("debit", "debit", {unique:false});
+                    entryStore.createIndex("credit", "credit", {unique:false});
+                    
+                    window.checkbook = new Checkbook(database);
+                    window.checkbook.update();
+                    document.body.appendChild(window.checkbook.element);
+                }
+            );
+            request.addEventListener
+            (
+                "error",
+                (event) =>
+                {
+                    document.write(event.target.error);
+                }
+            );
+        </script>
+    </body>
+</html>
