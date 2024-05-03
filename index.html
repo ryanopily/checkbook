@@ -48,10 +48,6 @@
                     entryStore.createIndex("reconcile", "reconcile", {unique:false});
                     entryStore.createIndex("debit", "debit", {unique:false});
                     entryStore.createIndex("credit", "credit", {unique:false});
-                    
-                    window.checkbook = new Checkbook(database);
-                    window.checkbook.update();
-                    document.body.appendChild(window.checkbook.element);
                 }
             );
             request.addEventListener
