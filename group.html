@@ -9,7 +9,7 @@
                 box-sizing: border-box;
             }
 
-            checkbook
+            checkbook-register
             {
                 display: block;
                 overflow-x: auto;
@@ -22,7 +22,7 @@
                 border-collapse: collapse;
             }
         </style>
-        <script src="./checkbook.js"></script>
+        <script src="./group.js"></script>
     </head>
     <body>
         <script>
@@ -32,9 +32,9 @@
                 "success",
                 (event) =>
                 {
-                    window.checkbook = new Checkbook(event.target.result);
-                    window.checkbook.update();
-                    document.body.appendChild(window.checkbook.element);
+                    window.group = new GroupRegister(event.target.result);
+                    group.update();
+                    document.body.appendChild(group.element);
                 }
             );
             request.addEventListener
