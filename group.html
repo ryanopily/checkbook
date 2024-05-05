@@ -43,11 +43,10 @@
                 (event) =>
                 {
                     let database = event.target.result;
-                    let entryStore, groupStore;
 
                     if(event.oldVersion < 1)
                     {
-                        entryStore = database.createObjectStore("entry", {autoIncrement: true});
+                        let entryStore = database.createObjectStore("entry", {autoIncrement: true});
                         entryStore.createIndex("date", "date", {unique:false});
                         entryStore.createIndex("reconcile", "reconcile", {unique:false});
                         entryStore.createIndex("debit", "debit", {unique:false});
@@ -55,8 +54,9 @@
                     }
                     if(event.oldVersion < 2)
                     {
+                        let entryStore = event.currentTarget.transaction.objectStore("entry");
                         entryStore.createIndex("code", "code", {unique:false});
-                        groupStore = database.createObjectStore("group", {keyPath: "code"});
+                        let groupStore = database.createObjectStore("group", {keyPath: "code"});
                     }
                 }
             );
