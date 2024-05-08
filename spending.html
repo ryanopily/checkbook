@@ -40,7 +40,7 @@
                                     let spending = currentValue["debit"] - currentValue["credit"];
                                     if(spending < 0)
                                     {
-                                        previousValue[currentValue["code"]] = Math.abs(spending);
+                                        previousValue[currentValue["code"]] += Math.abs(spending);
                                     }
                                     return previousValue;
                                 },
