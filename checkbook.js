@@ -251,4 +251,21 @@ class Checkbook
             }
         );
     }
+
+    getEntries()
+    {
+        return new Promise
+        (
+            (resolve, reject) =>
+            {
+                let entries = [];
+                let transaction = this.#database.transaction("entry", "readonly");
+                let entryStore = transaction.objectStore("entry");
+                let request = entryStore.getAll();
+                request.addEventListener("success", (event) => entries = event.target.result);
+                transaction.addEventListener("complete", (event) => resolve(entries));
+                transaction.addEventListener("error", (event) => reject(event.target.error));
+            }
+        );
+    }
 }

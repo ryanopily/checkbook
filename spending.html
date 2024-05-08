@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="charset" content="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <style>
+            *
+            {
+                box-sizing: border-box;
+            }
+            canvas
+            {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="./checkbook.js"></script>
+        <script src="./group.js"></script>
+    </head>
+    <body>
+        <canvas></canvas>
+        <script>
+            let request = window.indexedDB.open("checkbook-register", 2);
+            request.addEventListener
+            (
+                "success",
+                (event) =>
+                {
+                    window.checkbook = new Checkbook(event.target.result);
+                    
+                    window.checkbook.getEntries().then
+                    (
+                        (entries) =>
+                        {
+                            let data = entries.reduce
+                            (
+                                (previousValue, currentValue) => 
+                                {
+                                    let spending = currentValue["debit"] - currentValue["credit"];
+                                    if(spending < 0)
+                                    {
+                                        previousValue[currentValue["code"]] = Math.abs(spending);
+                                    }
+                                    return previousValue;
+                                },
+                                {}
+                            );
+
+                            const ctx = document.body.querySelector("canvas");
+
+                            new Chart
+                            (
+                                ctx, 
+                                {
+                                    type: 'pie',
+                                    data: 
+                                    {
+                                        labels: Object.keys(data),
+                                        datasets: 
+                                        [
+                                            {
+                                                label: 'Spending',
+                                                data: Object.values(data),
+                                            }
+                                        ]
+                                    },
+                                }
+                            );
+                        }    
+                    );
+                }
+            );
+            request.addEventListener
+            (
+                "upgradeneeded",
+                (event) =>
+                {
+                    let database = event.target.result;
+
+                    if(event.oldVersion < 1)
+                    {
+                        let entryStore = database.createObjectStore("entry", {autoIncrement: true});
+                        entryStore.createIndex("date", "date", {unique:false});
+                        entryStore.createIndex("reconcile", "reconcile", {unique:false});
+                        entryStore.createIndex("debit", "debit", {unique:false});
+                        entryStore.createIndex("credit", "credit", {unique:false});
+                    }
+                    if(event.oldVersion < 2)
+                    {
+                        let entryStore = event.currentTarget.transaction.objectStore("entry");
+                        entryStore.createIndex("code", "code", {unique:false});
+                        let groupStore = database.createObjectStore("group", {keyPath: "code"});
+                    }
+                }
+            );
+        </script>
+    </body>
+</html>
